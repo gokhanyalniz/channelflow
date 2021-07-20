@@ -10,6 +10,5 @@ set(
 )
 
 # Define the target with appropriate dependencies
-install_channelflow_library(pycf)
-target_include_directories(pycf SYSTEM PUBLIC ${Boost_INCLUDE_DIRS} ${PYTHON_INCLUDE_DIRS})
-target_link_libraries(pycf PUBLIC ${Boost_LIBRARIES} nsolver chflow)
+pybind11_add_module(libpycf cfwrapper.cpp)
+target_link_libraries(libpycf PUBLIC ${pybind11_LIBRARIES} nsolver chflow)

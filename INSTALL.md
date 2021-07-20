@@ -22,7 +22,7 @@ To enable parallelization, to use the NetCDF format (easy visualization with Par
 * HDF5(cxx) (format available for backwards compatibility)
 
 To use Channelflow functions from the Python wrapper:
-* boost-python
+* pybind11
 
 
 ### Compilation
@@ -49,7 +49,7 @@ Channelflow supports, beneath other standard cmake flags, the following options
 |`-DUSE_MPI`              | ON/OFF  | ON        | Enable MPI                                                        |
 |`-DWITH_SHARED`          | ON/OFF  | ON        | build shared channelflow and nsolver libraries                    |
 |`-DWITH_STATIC`          | ON/OFF  | OFF       | build static libraries (also enables linking to static libraries) |
-|`-DWITH_PYTHON`          | ON/OFF  | OFF       | build a python wrapper for flowfields, disabled by default because it requires boost-python |
+|`-DWITH_PYTHON`          | ON/OFF  | OFF       | build a python wrapper for flowfields, disabled by default because it requires pybind11 |
 |`-DWITH_HDF5CXX`         |  ON/OFF | OFF       | enable legacy .h5 file format (using HDF5 C++)                    |
 
 

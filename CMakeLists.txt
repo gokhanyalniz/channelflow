@@ -22,7 +22,7 @@ OPTION(USE_MPI "use mpi, if found" ON) # use -DUSE_MPI=off to force disable use 
 OPTION(BUILD_SHARED_LIBS "Builds shared libraries if ON, static libraries if OFF" ON)
 OPTION(SET_RPATH "set the rpath of the executable to the found libraries" ON)
 OPTION(WITH_NSOLVER "compile support for the nsolver module" ON)
-OPTION(WITH_PYTHON "build a python wrapper, using boost-python" OFF)
+OPTION(WITH_PYTHON "build a python wrapper, using pybind11" OFF)
 OPTION(WITH_HDF5CXX "enable legacy file format using hdf5 cxx" OFF)
 OPTION(WITH_GTEST "enable gtest unit testing" ON)
 
@@ -190,14 +190,14 @@ add_subdirectory(programs)
 add_subdirectory(tools)
 add_subdirectory(examples)
 
-# Check if we want to build the python wrapper and have boost-python
-# If Python and boost.python are there, build python interface
+# Check if we want to build the python wrapper and have pybind11
+# If Python and pybind11 are there, build python interface
 if (WITH_PYTHON)
     if (USE_MPI)
             message(FATAL_ERROR "Compiling the python wrapper requires -DUSE_MPI=OFF")
     endif()
-    find_package(Boost COMPONENTS python REQUIRED)
-    find_package(PythonLibs 2.7 REQUIRED)
+    find_package(pybind11 REQUIRED)
+    find_package(PythonLibs REQUIRED)
     message(STATUS "Building with Python interface.")
     add_subdirectory(python-wrapper)
 endif ()
