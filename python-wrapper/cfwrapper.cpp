@@ -119,17 +119,17 @@ PYBIND11_MODULE(libpycf, m) {
         .def(py::self += py::self)
         .def(py::self -= py::self);
 
-    // py::class_<FieldSymmetry>(m, "FieldSymmetry")
-    //     .def(py::init<FieldSymmetry>())
-    //     .def(py::init<string>())
-    //     .def(py::init<int, int, int, Real, Real, int>())
-    //     .def_property_readonly("sx", &FieldSymmetry::sx)
-    //     .def_property_readonly("sy", &FieldSymmetry::sy)
-    //     .def_property_readonly("sz", &FieldSymmetry::sz)
-    //     .def_property_readonly("ax", &FieldSymmetry::ax)
-    //     .def_property_readonly("az", &FieldSymmetry::az)
-    //     .def("__call__",
-    //          static_cast<FlowField (FieldSymmetry::*)(const FlowField& u) const>(&FieldSymmetry::operator()));
+    py::class_<FieldSymmetry>(m, "FieldSymmetry")
+        .def(py::init<FieldSymmetry>())
+        .def(py::init<string>())
+        .def(py::init<int, int, int, Real, Real, int>())
+        .def_property_readonly("sx", &FieldSymmetry::sx)
+        .def_property_readonly("sy", &FieldSymmetry::sy)
+        .def_property_readonly("sz", &FieldSymmetry::sz)
+        .def_property_readonly("ax", &FieldSymmetry::ax)
+        .def_property_readonly("az", &FieldSymmetry::az)
+        .def("__call__",
+             static_cast<FlowField (FieldSymmetry::*)(const FlowField& u) const>(&FieldSymmetry::operator()));
 
     // m.def("L2Norm", &L2Norm_wrapped);
     // m.def("L2Norm2", &L2Norm2_wrapped);
