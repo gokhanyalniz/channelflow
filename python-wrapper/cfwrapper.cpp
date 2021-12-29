@@ -17,7 +17,6 @@ namespace chflow {
 
 /*** Access functions for FlowField values ***/
 // Real FlowField_get_val(FlowField& self, py::tuple t) {
-//     // A check that len(t) = 4 would be helpful
 //     if (self.xzstate() == Spectral)
 //         throw runtime_error("Trying to access physical data, but FlowField is in spectral state");
 //     int nx = py::cast<int>(t[0]);
@@ -75,7 +74,7 @@ Real L2IP_wrapped(const FlowField& f, const FlowField& g) {
 // Real wallshearLower_wrapped(const FlowField& f) { return wallshearLower(f); }
 // Real L2Norm3d_wrapped(const FlowField& f) { return L2Norm3d(f); }
 // Real Ecf_wrapped(const FlowField& f) { return Ecf(f); }
-// FlowField curl_wrapped(const FlowField& f) { return curl(f); }
+FlowField curl_wrapped(const FlowField& f) { return curl(f); }
 // FlowField lapl_wrapped(const FlowField& f) { return lapl(f); }
 // FlowField grad_wrapped(const FlowField& f) { return grad(f); }
 // FlowField div_wrapped(const FlowField& f) { return div(f); }
@@ -91,22 +90,23 @@ PYBIND11_MODULE(libpycf, m) {
         .def(py::init<int, int, int, int, Real, Real, Real, Real>())
         .def("save", &FlowField_save)
         // .def("get", &FlowField_get_val)
-        // .def("cmplx", &FlowField_get_cmplx)
+        // .def("set", &FlowField_set_val)
         .def("__getitem__", &FlowField_get_cmplx)
         .def("__setitem__", &FlowField_set_cmplx)
         // .def("makePhysical", &FlowField::makePhysical)
         // .def("makeSpectral", &FlowField::makeSpectral)
+        .def("zeroPaddedModes", &FlowField::zeroPaddedModes)
         // .def("setToZero", &FlowField::setToZero)
         .def_property_readonly("Nx", &FlowField::Nx)
         .def_property_readonly("Ny", &FlowField::Ny)
         .def_property_readonly("Nz", &FlowField::Nz)
-        // .def_property_readonly("Nd", &FlowField::Nd)
+        .def_property_readonly("Nd", &FlowField::Nd)
         // .def_property_readonly("Mx", &FlowField::Mx)
         // .def_property_readonly("My", &FlowField::My)
         // .def_property_readonly("Mz", &FlowField::Mz)
         .def_property_readonly("Lx", &FlowField::Lx)
-        .def_property_readonly("Ly", &FlowField::Ly)
-        // .def_property_readonly("Lz", &FlowField::Lz)
+        // .def_property_readonly("Ly", &FlowField::Ly)
+        .def_property_readonly("Lz", &FlowField::Lz)
         .def_property_readonly("a", &FlowField::a)
         .def_property_readonly("b", &FlowField::b)
         // .def("x", &FlowField::x)
@@ -139,7 +139,7 @@ PYBIND11_MODULE(libpycf, m) {
     // m.def("wallshearLower", &wallshearLower_wrapped);
     // m.def("wallshearUpper", &wallshearUpper_wrapped);
     // m.def("L2Norm3d", &L2Norm3d_wrapped);
-    // m.def("curl", &curl_wrapped);
+    m.def("curl", &curl_wrapped);
 }
 
 }  // namespace chflow
