@@ -11,4 +11,5 @@ set(
 
 # Define the target with appropriate dependencies
 pybind11_add_module(libpycf cfwrapper.cpp)
+install(TARGETS libpycf DESTINATION lib)
 target_link_libraries(libpycf PUBLIC ${pybind11_LIBRARIES} nsolver chflow)
