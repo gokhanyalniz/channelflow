@@ -37,8 +37,8 @@ int main(int argc, char* argv[]) {
         int nproc1 = args.getint("-np1", "-nproc1", 0, "number of processes for slice fft");
         bool fftwmeasure = args.getflag("-fftwmeasure", "--fftwmeasure", "use fftw_measure instead of fftw_patient");
         bool fftwwisdom = args.getflag("-fftwwisdom", "--fftwwisdom", "try loading fftw wisdom");
-        bool saveresult = args.getflag("-s", "--saveresult", "save resulting field to uresult.h5");
-        bool nocomparison = args.getflag("-nc", "--nocompare", "don't compare integrated field to ufinal.h5");
+        bool saveresult = args.getflag("-s", "--saveresult", "save resulting field to uresult.nc");
+        bool nocomparison = args.getflag("-nc", "--nocompare", "don't compare integrated field to ufinal.nc");
         string dir = args.getstr("-d", "--directory", ".", "directory where fields are found and stored");
         args.check();
 

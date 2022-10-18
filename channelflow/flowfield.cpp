@@ -13,18 +13,6 @@
 #include <mpi.h>
 #endif
 
-// HAVE_LIBHDF5_CPP is determined by the autoconf system and
-// defined in ../config.h when HDF5 is present and left undefined
-// when it isn't. Here we define HAVE_HDF5 to 0 or 1 so that it
-// can be used in if (HAVE_HDF5) statements later on.
-
-#ifdef HAVE_LIBHDF5_CPP
-#include "H5Cpp.h"
-#define HAVE_HDF5 1
-#else
-#define HAVE_HDF5 0
-#endif
-
 // Decide if and how (if parallel) NetCDF may be used
 #ifdef HAVE_NETCDF_PAR_H
 #include <netcdf_par.h>
@@ -51,17 +39,6 @@ using namespace std;
 using namespace Eigen;
 
 namespace chflow {
-
-#ifdef HAVE_LIBHDF5_CPP
-void hdf5write(int i, const string& name, H5::H5File& h5file);
-void hdf5write(Real x, const string& name, H5::H5File& h5file);
-void hdf5write(const Vector& v, const string& name, H5::H5File& h5file);
-void hdf5write(const FlowField& u, const string& name, H5::H5File& h5file);
-bool hdf5query(const string& name, H5::H5File& h5file);  // does attribute exist?
-void hdf5read(int& i, const string& name, H5::H5File& h5file);
-void hdf5read(Real& x, const string& name, H5::H5File& h5file);
-void hdf5read(FlowField& u, const string& name, H5::H5File& h5file);
-#endif
 
 void writefloat(std::ofstream& os, float z, bool SwapEndian = true);
 
@@ -109,23 +86,17 @@ FlowField::FlowField(const string& filebase, CfMPI* cfmpi) {
     cfmpi_ = cfmpi;
     // Cases, in order of precedence:
     //    -------conditions---------
-    //    filebase exists   HDF5libs   read
-    // 1  foo.h5   foo.h5   yes        foo.h5
-    // 2  foo      foo.h5   yes        foo.h5
-    // 3  foo.ff   foo.ff   either     foo.ff
-    // 4  foo      foo.ff   either     foo.ff
+    //    filebase exists   read
+    // 1  foo.ff   foo.ff   foo.ff
+    // 2  foo      foo.ff   foo.ff
     // else fail
 
     string ncname = appendSuffix(filebase, ".nc");
-    string h5name = appendSuffix(filebase, ".h5");
     string ffname = appendSuffix(filebase, ".ff");
     string filename;
 
     if (HAVE_NETCDF && isReadable(ncname))
         filename = ncname;
-
-    else if (HAVE_HDF5 && isReadable(h5name))  // cases 1 and 2
-        filename = h5name;
 
     else if (isReadable(ffname))  // cases 3 and 4
         filename = ffname;
@@ -133,86 +104,15 @@ FlowField::FlowField(const string& filebase, CfMPI* cfmpi) {
     else {
         stringstream serr;
         serr << "error in FlowField(string filebase) : can't open filebase==" << filebase << endl;
-        if (HAVE_HDF5)
-            serr << "neither " << h5name << " nor " << ffname << " is readable" << endl;
-        else
-            serr << ffname << ".ff is unreadable" << endl;
+        serr << ffname << ".ff is unreadable" << endl;
         cferror(serr.str());
     }
 
-    // At this point, filename should have an .h5 or .ff extension, and that
-    // file should be readable. Further, if it has .h5, the HDF5 libs are installed.
+    // At this point, filename should have an .ff extension, and that
+    // file should be readable.
 
     if (hasSuffix(filename, ".nc")) {
         readNetCDF(filename);
-
-    } else if (hasSuffix(filename, ".h5")) {
-#ifndef HAVE_LIBHDF5_CPP
-        cferror("error in FlowField(string filebase). This line should be unreachable");
-#else
-        using namespace H5;
-        H5File h5file;
-
-        auto Nx = 0;
-        auto Ny = 0;
-        auto Nz = 0;
-
-        if (taskid() == 0) {
-            h5file = H5File(filename.c_str(), H5F_ACC_RDONLY);
-            hdf5read(Nx_, "Nxpad", h5file);
-            hdf5read(Ny_, "Nypad", h5file);
-            hdf5read(Nz_, "Nzpad", h5file);
-            hdf5read(Nd_, "Nd", h5file);
-            hdf5read(Nx, "Nx", h5file);
-            hdf5read(Ny, "Ny", h5file);
-            hdf5read(Nz, "Nz", h5file);
-            hdf5read(Lx_, "Lx", h5file);
-            hdf5read(Lz_, "Lz", h5file);
-            hdf5read(a_, "a", h5file);
-            hdf5read(b_, "b", h5file);
-
-            if (Ny != Ny_)
-                cferror("error in FlowField(string h5filename) : Ny != Nypad in h5 file");
-        }
-
-#ifdef HAVE_MPI
-        MPI_Bcast(&Nx_, 1, MPI_INT, 0, cfmpi_->comm_world);
-        MPI_Bcast(&Ny_, 1, MPI_INT, 0, cfmpi_->comm_world);
-        MPI_Bcast(&Nz_, 1, MPI_INT, 0, cfmpi_->comm_world);
-        MPI_Bcast(&Nd_, 1, MPI_INT, 0, cfmpi_->comm_world);
-        MPI_Bcast(&Nx, 1, MPI_INT, 0, cfmpi_->comm_world);
-        MPI_Bcast(&Ny, 1, MPI_INT, 0, cfmpi_->comm_world);
-        MPI_Bcast(&Nz, 1, MPI_INT, 0, cfmpi_->comm_world);
-        MPI_Bcast(&Lx_, 1, MPI_DOUBLE, 0, cfmpi_->comm_world);
-        MPI_Bcast(&Lz_, 1, MPI_DOUBLE, 0, cfmpi_->comm_world);
-        MPI_Bcast(&a_, 1, MPI_DOUBLE, 0, cfmpi_->comm_world);
-        MPI_Bcast(&b_, 1, MPI_DOUBLE, 0, cfmpi_->comm_world);
-#endif
-
-        resize(Nx_, Ny_, Nz_, Nd_, Lx_, Lz_, a_, b_, cfmpi_);
-
-        if (Nx == Nx_ && Ny == Ny_ && Nz == Nz_) {  // means that FlowField isn't padded
-#ifdef HAVE_MPI
-            CfMPI_single* CfMPI_one = &CfMPI_single::getInstance();
-            FlowField v(Nx, Ny, Nz, Nd_, Lx_, Lz_, a_, b_, CfMPI_one, Physical, Physical);
-            hdf5read(v, "data/u", h5file);
-            this->interpolate(v);
-#else
-            hdf5read(*this, "data/u", h5file);
-#endif
-            this->setPadded(false);
-        } else {  // padded FlowField
-            CfMPI_single* CfMPI_one = nullptr;
-#ifdef HAVE_MPI
-            CfMPI_one = &CfMPI_single::getInstance();
-#endif
-            FlowField v(Nx, Ny, Nz, Nd_, Lx_, Lz_, a_, b_, CfMPI_one, Physical, Physical);
-            hdf5read(v, "data/u", h5file);
-
-            this->interpolate(v);
-            this->setPadded(((2 * Nx_) / 3 >= Nx && (2 * Nz_) / 3 >= Nz) ? true : false);
-        }
-#endif  // HAVE_HDF5_LIB
     } else {
         ifstream is(filename.c_str());
         if (!is) {
@@ -2599,7 +2499,6 @@ void FlowField::save(const string& filebase, vector<string> component_names) con
     string filename;
 
     bool ncsuffix = hasSuffix(filebase, ".nc");
-    bool h5suffix = hasSuffix(filebase, ".h5");
     bool ffsuffix = hasSuffix(filebase, ".ff");
     bool ascsuffix = hasSuffix(filebase, ".asc");
     bool vtksuffix = hasSuffix(filebase, ".vtk");
@@ -2607,15 +2506,6 @@ void FlowField::save(const string& filebase, vector<string> component_names) con
     /* suffix is given */
     if (ffsuffix)
         binarySave(filebase);
-    else if (h5suffix)
-        if (HAVE_HDF5)
-            hdf5Save(filebase);
-        else {
-            cferror(
-                "FlowField::save(filename) error : can't save to HDF5 file because HDF5 libraries are not installed. "
-                "filename == " +
-                filebase);
-        }
     else if (ncsuffix)
         if (HAVE_NETCDF)
             writeNetCDF(filebase, component_names);
@@ -2633,8 +2523,6 @@ void FlowField::save(const string& filebase, vector<string> component_names) con
     /* suffix is not given */
     else if (HAVE_NETCDF)
         writeNetCDF(filebase, component_names);
-    else if (HAVE_HDF5)
-        hdf5Save(filebase);
     else
         binarySave(filebase);
 }
@@ -2722,75 +2610,10 @@ void FlowField::binarySave(const string& filebase) const {
     }
 }
 
-#ifndef HAVE_LIBHDF5_CPP
-
-void FlowField::hdf5Save(const string& filebase) const {
-    cferror("FlowField::hdf5save requires HDF5 libraries. Please install them and recompile channelflow.");
-}
-
-#else
-void FlowField::hdf5Save(const string& filebase) const {
-    FlowField v;
-    // If this FlowField is padded (last 1/3 x,z modes are set to zero)
-    // transfer to nopadded grid and save that
-    int Nx, Nz;
-    if (this->padded()) {
-        Nx = (2 * Nx_) / 3;
-        Nz = (2 * Nz_) / 3;
-
-    } else {
-        Nx = Nx_;
-        Nz = Nz_;
-        //    v = *this;
-    }
-
-    FlowField& u = const_cast<FlowField&>(*this);
-    fieldstate initxzstate = u.xzstate();
-    fieldstate initystate = u.ystate();
-    u.makeSpectral();
-
-    CfMPI_single* CfMPI_one = nullptr;
-#ifdef HAVE_MPI
-    CfMPI_one = &CfMPI_single::getInstance();
-#endif
-    v = FlowField(Nx, Ny_, Nz, Nd_, Lx_, Lz_, a_, b_, CfMPI_one);  // FlowField is only on process 0 -- serial io
-    v.interpolate(u);
-
-    v.makePhysical();
-
-    if (v.taskid() == 0) {
-        H5std_string h5name = appendSuffix(filebase, ".h5");
-        H5::H5File h5file(h5name, H5F_ACC_TRUNC);
-
-        // create the groups we will need
-        h5file.createGroup("/geom");
-        h5file.createGroup("/data");
-
-        hdf5write(v.xgridpts(), "/geom/x", h5file);
-        hdf5write(v.ygridpts(), "/geom/y", h5file);
-        hdf5write(v.zgridpts(), "/geom/z", h5file);
-        hdf5write(Nx, "Nx", h5file);
-        hdf5write(Ny_, "Ny", h5file);
-        hdf5write(Nz, "Nz", h5file);
-        hdf5write(Nd_, "Nd", h5file);
-        hdf5write(Nx_, "Nxpad", h5file);
-        hdf5write(Ny_, "Nypad", h5file);
-        hdf5write(Nz_, "Nzpad", h5file);
-        hdf5write(v, "/data/u", h5file);
-
-        hdf5write(Lx_, "Lx", h5file);
-        hdf5write(Lz_, "Lz", h5file);
-        hdf5write(a_, "a", h5file);
-        hdf5write(b_, "b", h5file);
-    }
-    u.makeState(initxzstate, initystate);
-}
-#endif  // HAVE_HDF5LIB_CPP
-
 void FlowField::removePaddedModes(Real* rdata_io, lint Nxloc_io, lint nxlocmin_io, lint Mzloc_io,
                                   lint mzlocmin_io) const {
     /* Removal of padded modes in parallel and within the object (in contrast of using interpolation onto a smaller
-     * grid, e.g. in hdf5Save)*/
+     * grid)*/
 
     // bring flow field into intermediate state
     FlowField v(*this);  // make copy to save back transformation from intermediate state
@@ -4290,160 +4113,6 @@ FlowField polynomialInterpolate(cfarray<FlowField>& un, cfarray<Real>& mun, Real
 }
 
 //=======================================================================
-#ifdef HAVE_LIBHDF5_CPP
-
-void hdf5write(int i, const string& name, H5::H5File& h5file) {
-    herr_t status = H5Tconvert(H5T_NATIVE_INT, H5T_STD_I32BE, 1, &i, NULL, H5P_DEFAULT);
-    if (status < 0) {
-        cout << "HDF5 datatype conversion failed! Status: " << status;
-    }
-
-    H5::Group rootgr = h5file.openGroup("/");
-    H5::DataSpace dspace = H5::DataSpace(H5S_SCALAR);
-    H5::Attribute attr = rootgr.createAttribute(name.c_str(), H5::PredType::STD_I32BE, dspace);
-    attr.write(H5::PredType::STD_I32BE, &i);
-}
-
-void hdf5write(Real x, const string& name, H5::H5File& h5file) {
-    herr_t status = H5Tconvert(H5T_NATIVE_DOUBLE, H5T_IEEE_F64BE, 1, &x, NULL, H5P_DEFAULT);
-    if (status < 0) {
-        cout << "HDF5 datatype conversion failed! Status: " << status;
-    }
-
-    H5::Group rootgr = h5file.openGroup("/");
-    H5::DataSpace dspace = H5::DataSpace(H5S_SCALAR);
-    H5::Attribute attr = rootgr.createAttribute(name.c_str(), H5::PredType::IEEE_F64BE, dspace);
-    attr.write(H5::PredType::IEEE_F64BE, &x);
-}
-
-void hdf5write(const Vector& v, const string& name, H5::H5File& h5file) {
-    const int N = v.length();
-    const hsize_t hnx[1] = {(hsize_t)N};
-
-    auto data = vector<Real>(N, 0.0);
-    copy(v.pointer(), v.pointer() + N, begin(data));
-
-    // create H5 dataspace, convert from native double to 64-bit IEE
-    H5::DataSpace dspace(1, hnx);
-    H5::DataSet dset = h5file.createDataSet(name.c_str(), H5::PredType::IEEE_F64BE, dspace);
-    herr_t status = H5Tconvert(H5T_NATIVE_DOUBLE, H5T_IEEE_F64BE, N, data.data(), NULL, H5P_DEFAULT);
-
-    if (status < 0) {
-        cout << "HDF5 datatype conversion failed! Status: " << status;
-    }
-    dset.write(data.data(), H5::PredType::IEEE_F64BE);
-    dset.close();
-}
-
-void hdf5write(const FlowField& u, const string& name, H5::H5File& h5file) {
-    const int Nx = u.Nx();
-    const int Ny = u.Ny();
-    const int Nz = u.Nz();
-    const int Nd = u.Nd();
-    const int dsize = Nx * Ny * Nz * Nd;
-
-    auto data = vector<double>(dsize, 0.0);  // create cfarray of data to be written
-
-    for (int nx = 0; nx < Nx; ++nx)
-        for (int ny = 0; ny < Ny; ++ny)
-            for (int nz = 0; nz < Nz; ++nz)
-                for (int i = 0; i < Nd; ++i)
-                    data[nz + Nz * (ny + Ny * (nx + Nx * i))] = u(nx, ny, nz, i);
-    const hsize_t dimsf[4] = {(hsize_t)Nd, (hsize_t)Nz, (hsize_t)Ny, (hsize_t)Nx};  // dataset dimensions
-
-    H5::DataSpace dspace(4, dimsf);  // create dataspace
-    H5::DataSet dset = h5file.createDataSet(name.c_str(), H5::PredType::IEEE_F64BE, dspace);
-    herr_t status = H5Tconvert(H5T_NATIVE_DOUBLE, H5T_IEEE_F64BE, data.size(), data.data(), NULL, H5P_DEFAULT);
-    if (status < 0) {
-        cout << "HDF5 datatype conversion failed! Status: " << status;
-    }
-    dset.write(data.data(), H5::PredType::IEEE_F64BE);  // write data to dataset
-    dset.close();
-}
-
-bool hdf5query(const string& name, H5::H5File& h5file) {
-    // Yucky. HDF5 does not have a "does attribute exist?" function,
-    // so we have to loop over all attributes and test.
-    H5::Group rootgr = h5file.openGroup("/");
-    const uint N = rootgr.getNumAttrs();
-
-    for (uint i = 0; i < N; ++i) {
-        H5::Attribute attr = rootgr.openAttribute(i);
-        if (attr.getName() == name)
-            return true;
-    }
-    return false;
-}
-
-void hdf5read(int& i, const string& name, H5::H5File& h5file) {
-    H5::Group rootgr = h5file.openGroup("/");
-    H5::Attribute attr = rootgr.openAttribute(name.c_str());
-    attr.read(H5::PredType::STD_I32BE, &i);
-    H5Tconvert(H5T_STD_I32BE, H5T_NATIVE_INT, 1, &i, NULL, H5P_DEFAULT);
-}
-
-void hdf5read(Real& x, const string& name, H5::H5File& h5file) {
-    H5::Group rootgr = h5file.openGroup("/");
-    H5::Attribute attr = rootgr.openAttribute(name.c_str());
-    attr.read(H5::PredType::IEEE_F64BE, &x);
-    H5Tconvert(H5T_IEEE_F64BE, H5T_NATIVE_DOUBLE, 1, &x, NULL, H5P_DEFAULT);
-}
-
-void hdf5read(FlowField& u, const string& name, H5::H5File& h5file) {
-    u.setState(Physical, Physical);
-    assert(u.numtasks() == 1);
-    if (u.taskid() == 0) {
-        const uint Nx = u.Nx();
-        const uint Ny = u.Ny();
-        const uint Nz = u.Nz();
-        const uint Nd = u.Nd();
-
-        H5::DataSet dataset = h5file.openDataSet(name.c_str());
-        H5::DataSpace dataspace = dataset.getSpace();
-        // int rank = dataspace.getSimpleExtentNdims();
-        // hsize_t Nh5[4]; // Nd x Nx x Ny x Nz dimensions of h5 data cfarray
-        hsize_t Nh5[4];  // Nd x Nz x Ny x Nx dimensions of h5 data cfarray
-        int rank = dataspace.getSimpleExtentDims(Nh5, NULL);
-
-        if (rank != 4)
-            cferror("error reading FlowField from hdf5 file : rank of data is not 4");
-
-        Nh5[0] = Nd;
-        Nh5[1] = Nz;
-        Nh5[2] = Ny;
-        Nh5[3] = Nx;
-
-        H5::DataSpace memspace(4, Nh5);
-
-        int N = Nx * Ny * Nz * Nd;
-        auto buff = vector<Real>(N, 0.0);
-        dataset.read(buff.data(), H5::PredType::IEEE_F64BE, memspace, dataspace);
-
-        H5Tconvert(H5T_IEEE_F64BE, H5T_NATIVE_DOUBLE, buff.size(), buff.data(), NULL, H5P_DEFAULT);
-
-        for (uint nz = 0; nz < Nz; ++nz)
-            for (uint ny = 0; ny < Ny; ++ny)
-                for (uint nx = 0; nx < Nx; ++nx)
-                    for (uint i = 0; i < Nd; ++i)
-                        u(nx, ny, nz, i) = buff[nz + Nz * (ny + Ny * (nx + Nx * i))];
-        dataset.close();
-    }
-    u.makeSpectral();
-}
-
-void hdf5addstuff(const std::string& filebase, Real nu, ChebyCoeff Ubase, ChebyCoeff Wbase) {
-    H5std_string h5name = appendSuffix(filebase, ".h5");
-    H5::H5File h5file(h5name, H5F_ACC_TRUNC);
-    h5file.createGroup("/extras");
-
-    Ubase.makePhysical();
-    Wbase.makePhysical();
-    hdf5write(nu, "/extras/nu", h5file);
-    hdf5write(Ubase, "/extras/Ubase", h5file);
-    hdf5write(Wbase, "/extras/Wbase", h5file);
-}
-
-#endif  // HAVE_HDF5LIB_CPP
 
 int field2vector_size(const FlowField& u) {
     int Kx = u.kxmaxDealiased();

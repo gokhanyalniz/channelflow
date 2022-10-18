@@ -73,14 +73,13 @@ if (NETCDF_FOUND)
     target_link_libraries(chflow PRIVATE ${NETCDF_LIBRARIES})
 endif ()
 
-if (WITH_HDF5CXX)
-    target_include_directories(chflow SYSTEM PRIVATE ${HDF5_INCLUDE_DIRS})
-    target_link_libraries(chflow PRIVATE ${HDF5_LIBRARIES})
-endif ()
-
 if (WITH_NSOLVER)
     target_link_libraries(chflow PUBLIC nsolver)
 endif ()
+
+target_link_libraries(chflow PRIVATE libzip::zip)
+target_link_libraries(chflow PRIVATE hdf5::hdf5)
+target_link_libraries(chflow PRIVATE hdf5::hdf5_hl)
 
 # TODO: fix the following error in source files
 # target_compile_options(chflow PRIVATE "-Wno-error=misleading-indentation;-Wno-error=vla")

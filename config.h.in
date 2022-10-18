@@ -7,7 +7,6 @@
 #cmakedefine COMPILER_VERSION "@COMPILER_VERSION@"
 
 // Available libraries and features
-#cmakedefine HAVE_LIBHDF5_CPP
 #cmakedefine HAVE_NETCDF_H
 #cmakedefine HAVE_NETCDF_PAR_H
 #cmakedefine HAVE_MPI

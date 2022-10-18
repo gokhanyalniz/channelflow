@@ -19,7 +19,6 @@ To compile Channelflow:
 To enable parallelization, to use the NetCDF format (easy visualization with Paraview, VisIt ...) and to enable the parallel I/O:
 * MPI
 * NetCDF (parallel version 4 or higher)
-* HDF5(cxx) (format available for backwards compatibility)
 
 To use Channelflow functions from the Python wrapper:
 * pybind11
@@ -50,12 +49,11 @@ Channelflow supports, beneath other standard cmake flags, the following options
 |`-DWITH_SHARED`          | ON/OFF  | ON        | build shared channelflow and nsolver libraries                    |
 |`-DWITH_STATIC`          | ON/OFF  | OFF       | build static libraries (also enables linking to static libraries) |
 |`-DWITH_PYTHON`          | ON/OFF  | OFF       | build a python wrapper for flowfields, disabled by default because it requires pybind11 |
-|`-DWITH_HDF5CXX`         |  ON/OFF | OFF       | enable legacy .h5 file format (using HDF5 C++)                    |
 
 
 A complete installation, with all features enabled, might look like this:
 
-  `cmake PATH_TO_SOURCE -DCMAKE_BUILD_TYPE=release -DCMAKE_INSTALL_PREFIX=$HOME/usr -DWITH_PYTHON=ON -DWITH_HDF5CXX=ON`
+  `cmake PATH_TO_SOURCE -DCMAKE_BUILD_TYPE=release -DCMAKE_INSTALL_PREFIX=$HOME/usr -DWITH_PYTHON=ON`
 
 
 ### Tests

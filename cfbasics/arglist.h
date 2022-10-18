@@ -58,7 +58,7 @@ class ArgList {
     inline str getstr(int position, const str& meaning, const str& helpstr);
 
     // Return all arguments after the last one that is already used
-    // Allows for giving a list of files like 'command -a 0 -b 1 *.h5'
+    // Allows for giving a list of files like 'command -a 0 -b 1 *.nc'
     inline std::vector<std::string> remainingatend();
 
     inline void save(const str& outdir) const;  // save command-line to file <argv[0]>.args

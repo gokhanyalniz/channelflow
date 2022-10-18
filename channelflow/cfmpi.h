@@ -104,7 +104,7 @@ class CfMPI_single : public CfMPI {
     //  Can be used for creating non-distributed data
     //  when running with MPI.
     //  Actually needed as quick fix allowing IO with
-    //  legacy formats HDF5 and ff with MPI.
+    //  legacy format ff with MPI.
    private:
     using CfMPI::CfMPI;
 

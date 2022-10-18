@@ -109,7 +109,7 @@ int main(int argc, char* argv[]) {
         srchflags.outdir = "findsolnTest_output/";
         const bool normal = args.getflag("-n", "--normalize", "return |u-v|/sqrt(|u||v|)");
         const Real tol = args.getreal("-t", "--tolerance", 1.0e-5, "max distance allowed for the test to pass");
-        const string uname = "data/eq.h5";
+        const string uname = "data/eq.nc";
 
         fftw_loadwisdom();
 
@@ -194,9 +194,9 @@ int main(int argc, char* argv[]) {
             cout << "duration for this findsoln run: " << timeused << endl;
 
         // Test result against known equilibrium
-        FlowField u_ref("data/eq.h5", cfmpi);
+        FlowField u_ref("data/eq.nc", cfmpi);
 
-        // FlowField u_best("findsolnTest_output/xbest.h5", cfmpi);
+        // FlowField u_best("findsolnTest_output/xbest.nc", cfmpi);
 
         Real nrm = normal ? 1.0 / sqrt(L2Norm(u) * L2Norm(u_ref)) : 1;
         double l2d = nrm * L2Dist(u, u_ref);
