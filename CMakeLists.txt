@@ -103,6 +103,10 @@ find_package(FFTW REQUIRED)
 set(CMAKE_REQUIRED_INCLUDES ${FFTW_INCLUDE_DIR})
 CHECK_INCLUDE_FILES(fftw3.h HAVE_FFTW_H)
 
+# Need to move these into more appropriate locations and add messages
+find_package(libzip REQUIRED)
+find_package(HDF5 REQUIRED COMPONENTS C HL)
+
 if (USE_MPI)
     # In principle channelflow only needs MPI_C libraries and not MPI_CXX, but
     # the legacy file format with HDF5 C++ requires to link against MPI_CXX
