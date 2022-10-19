@@ -82,6 +82,15 @@ if (WITH_NSOLVER)
     target_link_libraries(chflow PUBLIC nsolver)
 endif ()
 
+# Need to move these into the appropriate if blocks
+target_link_libraries(chflow PRIVATE libzip::zip)
+target_link_libraries(chflow PRIVATE hdf5::hdf5)
+target_link_libraries(chflow PRIVATE hdf5::hdf5_hl)
+
+if (WITH_HDF5CXX)
+    target_link_libraries(chflow PRIVATE hdf5::hdf5_cpp)
+endif ()
+
 # TODO: fix the following error in source files
 # target_compile_options(chflow PRIVATE "-Wno-error=misleading-indentation;-Wno-error=vla")
 
