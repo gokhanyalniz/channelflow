@@ -24,7 +24,7 @@ using namespace chflow;
 
 string printdiagnostics(FlowField& u, const DNS& dns, Real t, const TimeStep& dt, Real nu, Real umin, bool vardt,
                         bool pl2norm, bool pchnorm, bool pdissip, bool pshear, bool pdiverge, bool pUbulk, bool pubulk,
-                        bool pdPdx, bool pcfl);
+                        bool pdPdx, bool pcfl, bool pdPdz);
 
 int main(int argc, char* argv[]) {
     cfMPI_Init(&argc, &argv);
@@ -52,7 +52,8 @@ int main(int argc, char* argv[]) {
         const bool pdiverge = args.getflag("-dv", "--divergence", "print divergence each dT");
         const bool pubulk = args.getflag("-u", "--ubulk", "print ubulk each dT");
         const bool pUbulk = args.getflag("-Up", "--Ubulk-print", "print Ubulk each dT");
-        const bool pdPdx = args.getflag("-p", "--pressure", "print pressure gradient each dT");
+        const bool pdPdx = args.getflag("-p", "--pressure", "print pressure gradient in x each dT");
+        const bool pdPdz = args.getflag("-pz", "--pressure", "print pressure gradient in z each dT");
         const Real umin = args.getreal("-u", "--umin", 0.0, "stop if chebyNorm(u) < umin");
 
         const Real ecfmin = args.getreal("-e", "--ecfmin", 0.0, "stop if Ecf(u) < ecfmin");
@@ -117,7 +118,7 @@ int main(int argc, char* argv[]) {
         for (Real t = flags.t0; t <= flags.T; t += dt.dT()) {
             string s;
             s = printdiagnostics(fields[0], dns, t, dt, flags.nu, umin, dt.variable(), pl2norm, pchnorm, pdissip,
-                                 pshear, pdiverge, pUbulk, pubulk, pdPdx, pcfl);
+                                 pshear, pdiverge, pUbulk, pubulk, pdPdx, pcfl, pdPdz);
             if (ecfmin > 0 && Ecf(fields[0]) < ecfmin) {
                 cferror("Ecf < ecfmin == " + r2s(ecfmin) + ", exiting");
             }
@@ -148,7 +149,7 @@ int main(int argc, char* argv[]) {
 
 string printdiagnostics(FlowField& u, const DNS& dns, Real t, const TimeStep& dt, Real nu, Real umin, bool vardt,
                         bool pl2norm, bool pchnorm, bool pdissip, bool pshear, bool pdiverge, bool pUbulk, bool pubulk,
-                        bool pdPdx, bool pcfl) {
+                        bool pdPdx, bool pcfl, bool pdPdz) {
     // Printing diagnostics
     stringstream sout;
     sout << "           t == " << t << endl;
@@ -184,6 +185,8 @@ string printdiagnostics(FlowField& u, const DNS& dns, Real t, const TimeStep& dt
     }
     if (pdPdx)
         sout << "          dPdx == " << dns.dPdx() << endl;
+    if (pdPdz)
+        sout << "          dPdz == " << dns.dPdz() << endl;
     if (pl2norm)
         sout << "     L2Norm(u) == " << L2Norm(u) << endl;
     if (pl2norm)
