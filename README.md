@@ -77,7 +77,7 @@ For detailed information about functionalities and specific options refer to the
 |**changegrid**| interpolates a given flowfield onto a different grid with specified geometry |
 |**diffops**| applies a differential operation to a given FlowField <br/> (derivatives; gradient; laplacian; curl; divergence; Q criterion; energy operator; pointwise norm; streamwise average)|
 |**extrapolatefield**| quadratic extrapolation of a FlowField u(mu) from three given flowfields and mu parameters|
-|**fieldconvert**| converts flowfield formats in NetCDF, binary (in both directions) and from NetCDF, binary to vtk or asci.|
+|**fieldconvert**| converts flowfield formats in NetCDF, hdf5, binary (in both directions) and from NetCDF, hdf5, binary to vtk or asci.|
 |**fieldprops**| prints informations about a given FlowField <br/> ( geometry; norms; symmetries; mean constraints; mean, spectral, dynamical and wall properties; statistics; mean velocity profile)|
 |**findsymmetries**| finds the symmetries satisfied by a given FlowField|
 |**L2op**| computes the L2 distance or the inner product between two given FlowFields|

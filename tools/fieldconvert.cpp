@@ -1,5 +1,5 @@
 /**
- * Program for writing state files from flowfield data, essentially a
+ * Program for writing HDF5 files from flowfield data, essentially a
  * modification of field2ascii. Some of the code and the accopmanying
  * comments are taken from the HDF group website (www.hdfgroup.org).
  *
@@ -22,10 +22,10 @@ int main(int argc, char* argv[]) {
     {
         string purpose(
             "conversion options:\n"
-            " \t.ff(binary)<--->.nc(NetCDF) in both "
+            " \t.ff(binary) <---> .h5(HDF5)    .ff(binary)<--->.nc(NetCDF)     .h5(HDF5)<--->.nc(NetCDF)    in both "
             "directions\n"
-            " \tFlowField(ff,nc)--->.asc (asci)\n"
-            " \tFlowField(ff,nc)--->.vtk \n");
+            " \tFlowField(ff,hdf5,nc)--->.asc (asci)\n"
+            " \tFlowField(ff,hdf5,nc)--->.vtk \n");
 
         ArgList args(argc, argv, purpose);
         const string iname = args.getstr(2, "<filename>", "input field");

@@ -60,7 +60,7 @@ class FlowField {
               fieldstate xzstate = Spectral, fieldstate ystate = Spectral, uint fftw_flags = FFTW_ESTIMATE);
 
     FlowField(const FlowField& u);
-    FlowField(const std::string& filebase, CfMPI* cfmpi = NULL);  // opens filebase.ff
+    FlowField(const std::string& filebase, CfMPI* cfmpi = NULL);  // opens filebase.h5 or filebase.ff
     FlowField(const std::string& filebase, int major, int minor, int update);
 
     FlowField& operator=(const FlowField& u);  // assign identical copy of U
@@ -225,6 +225,7 @@ class FlowField {
     // save methods add extension .asc or .ff ("flow field")
     void asciiSave(const std::string& filebase) const;
     void binarySave(const std::string& filebase) const;
+    void hdf5Save(const std::string& filebase) const;
     void writeNetCDF(const std::string& filebase,
                      std::vector<std::string> component_names = std::vector<std::string>()) const;
     void VTKSave(const std::string& filebase, bool SwapEndian = true) const;
@@ -232,7 +233,7 @@ class FlowField {
     // read methods
     void readNetCDF(const std::string& filebase);
 
-    // save to .ff based on file extension, or if none, presence of HDF5 libs # WHAT? HDF5 C++ NOW REMOVED
+    // save to .h5 or .ff based on file extension, or if none, presence of HDF5 libs
     void save(const std::string& filebase, std::vector<std::string> component_names = std::vector<std::string>()) const;
 
     // save k-normal slice of ith component at nkth gridpoint (along k-direction)
@@ -362,6 +363,8 @@ void transmit_coeff(FlowField& g, int gmx, int gmz, const FlowField& f, int fmx,
 
 // To set g(gmx,ny,gmz,i) on one processor with a complex value from another processor
 void transmit_coeff(FlowField& g, int gmx, int gmz, int ny, int i, const Complex& fval, int taskidf, int taskid = -1);
+
+void hdf5addstuff(const std::string& filebase, Real nu, ChebyCoeff& Ubase, ChebyCoeff& Wbase);
 
 // Vector-valued access methods
 inline int FlowField::flatten(int nx, int ny, int nz, int i) const {

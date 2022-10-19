@@ -23,6 +23,7 @@ OPTION(BUILD_SHARED_LIBS "Builds shared libraries if ON, static libraries if OFF
 OPTION(SET_RPATH "set the rpath of the executable to the found libraries" ON)
 OPTION(WITH_NSOLVER "compile support for the nsolver module" ON)
 OPTION(WITH_PYTHON "build a python wrapper, using pybind11" OFF)
+OPTION(WITH_HDF5CXX "enable legacy file format using hdf5 cxx" OFF)
 OPTION(WITH_GTEST "enable gtest unit testing" ON)
 
 # Set compiler flags that are build-type related
@@ -99,15 +100,12 @@ CHECK_INCLUDE_FILES(wordexp.h HAVE_WORDEXP_H)
 # Find all the dependencies
 find_package(Eigen3 REQUIRED)
 find_package(FFTW REQUIRED)
-find_package(libzip REQUIRED)
-find_package(HDF5 REQUIRED COMPONENTS C HL)
 set(CMAKE_REQUIRED_INCLUDES ${FFTW_INCLUDE_DIR})
 CHECK_INCLUDE_FILES(fftw3.h HAVE_FFTW_H)
 
 if (USE_MPI)
     # In principle channelflow only needs MPI_C libraries and not MPI_CXX, but
     # the legacy file format with HDF5 C++ requires to link against MPI_CXX
-    # NOT TRUE, HDF5 C++ IS NOW REMOVED!
     find_package(MPI COMPONENTS C CXX REQUIRED)
     set(HAVE_MPI TRUE)
     message(STATUS "MPI libs: ${MPI_CXX_LIBRARIES}")
@@ -145,6 +143,18 @@ if (WITH_NETCDF)
             message(FATAL ERROR "could not include netcdf_par.h [Required by WITH_NETCDF=Parallel]")
         endif ()
     endif ()
+endif ()
+
+if (WITH_HDF5CXX)
+    find_package(HDF5 COMPONENTS CXX REQUIRED)
+    get_filename_component(HDF5_LIBRARY_DIR "${HDF5_CXX_LIBRARY_hdf5}" DIRECTORY)
+    message(STATUS "Checking if hdf5 library functions in ${HDF5_LIBRARY_DIR} are working correctly.")
+    set(CMAKE_REQUIRED_INCLUDES ${HDF5_INCLUDE_DIRS})
+    CHECK_INCLUDE_FILES(hdf5.h HAVE_HDF5_H)
+    CHECK_LIBRARY_EXISTS(hdf5 H5D_init "${HDF5_LIBRARY_DIR}" HAVE_LIBHDF5)
+    set(CMAKE_REQUIRED_LIBRARIES hdf5) # need hdf5 to run hdf5_hl and hdf5_cpp
+    CHECK_LIBRARY_EXISTS(hdf5_hl H5Dopen2 "${HDF5_LIBRARY_DIR}" HAVE_LIBHDF5_HL)
+    CHECK_LIBRARY_EXISTS(hdf5_cpp H5Eprint2 "${HDF5_LIBRARY_DIR}" HAVE_LIBHDF5_CPP)
 endif ()
 
 ######## Create config.h from config.h.in ########
@@ -265,6 +275,13 @@ if (HAVE_NETCDF_PAR_H)
     message("   Parallel netcdf:                enabled")
 else ()
     message("   Parallel netcdf:                disabled")
+endif ()
+
+
+if (WITH_HDF5CXX)
+    message("   HDF5 C++ (legacy file format):  enabled")
+else ()
+    message("   HDF5 C++ (legacy file format):  disabled")
 endif ()
 
 message("\n   Channelflow components")
