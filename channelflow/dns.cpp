@@ -303,6 +303,14 @@ Real DNS::dPdx() const {
     else
         return 0.0;
 }
+Real DNS::dPdz() const {
+    if (main_nse_)
+        return main_nse_->dPdz();
+    else if (init_nse_)
+        return init_nse_->dPdz();
+    else
+        return 0.0;
+}
 Real DNS::Ubulk() const {
     if (main_nse_)
         return main_nse_->Ubulk();
@@ -316,6 +324,14 @@ Real DNS::dPdxRef() const {
         return main_nse_->dPdxRef();
     else if (init_nse_)
         return init_nse_->dPdxRef();
+    else
+        return 0.0;
+}
+Real DNS::dPdzRef() const {
+    if (main_nse_)
+        return main_nse_->dPdzRef();
+    else if (init_nse_)
+        return init_nse_->dPdzRef();
     else
         return 0.0;
 }
