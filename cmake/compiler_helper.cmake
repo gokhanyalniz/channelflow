@@ -14,7 +14,7 @@ function(set_warning_flags target)
         target_compile_options(
             ${target}
             PRIVATE
-            "-Wall;-Werror;-pedantic"
+            "-Wall;-pedantic"
         )
 
     elseif( CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang" )
@@ -22,7 +22,7 @@ function(set_warning_flags target)
         target_compile_options(
             ${target}
             PRIVATE
-            "-Wall;-Werror;-pedantic;-Wdocumentation"
+            "-Wall;-pedantic;-Wdocumentation"
         )
 
     elseif( CMAKE_CXX_COMPILER_ID STREQUAL "Intel" )
@@ -30,7 +30,7 @@ function(set_warning_flags target)
         target_compile_options(
             ${target}
             PRIVATE
-            "-Wall;-Werror"
+            "-Wall;"
         )
 
     elseif( CMAKE_CXX_COMPILER_ID STREQUAL "MSVC" )
