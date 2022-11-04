@@ -52,8 +52,8 @@ int main(int argc, char* argv[]) {
         const bool pdiverge = args.getflag("-dv", "--divergence", "print divergence each dT");
         const bool pubulk = args.getflag("-u", "--ubulk", "print ubulk each dT");
         const bool pUbulk = args.getflag("-Up", "--Ubulk-print", "print Ubulk each dT");
-        const bool pdPdx = args.getflag("-p", "--pressure", "print pressure gradient in x each dT");
-        const bool pdPdz = args.getflag("-pz", "--pressure", "print pressure gradient in z each dT");
+        const bool pdPdx = args.getflag("-px", "--pressurex", "print pressure gradient in x each dT");
+        const bool pdPdz = args.getflag("-pz", "--pressurez", "print pressure gradient in z each dT");
         const Real umin = args.getreal("-u", "--umin", 0.0, "stop if chebyNorm(u) < umin");
 
         const Real ecfmin = args.getreal("-e", "--ecfmin", 0.0, "stop if Ecf(u) < ecfmin");
