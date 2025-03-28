@@ -183,14 +183,31 @@ int main(int argc, char* argv[]) {
             cout << "----------Pressure Gradient and Bulk velocity------------" << endl;
             cout << "                     at Re = " << 1.0 / flags.nu << "\n" << endl;
 
-            cout << "dPdx(u)  == " << getdPdx(u, flags.nu) << endl;
-            cout << "Ubulk(u) == " << getUbulk(u) << endl;
+            // cout << "dPdx(u)  == " << getdPdx(u, flags.nu) << endl;
+            // cout << "dPdz(u)  == " << getdPdz(u, flags.nu) << endl;
+            // cout << "Ubulk(u) == " << getUbulk(u) << endl;
+            // cout << "Wbulk(u) == " << getWbulk(u) << endl;
+
+            // gokhan: increased precision printing
+            cout << "dPdx(u)  == " << fixed << setprecision(numeric_limits<double>::max_digits10) << getdPdx(u, flags.nu) << endl;
+            cout << "dPdz(u)  == " << fixed << setprecision(numeric_limits<double>::max_digits10) << getdPdz(u, flags.nu) << endl;
+            cout << "Ubulk(u) == " << fixed << setprecision(numeric_limits<double>::max_digits10) << getUbulk(u) << endl;
+            cout << "Wbulk(u) == " << fixed << setprecision(numeric_limits<double>::max_digits10) << getWbulk(u) << endl;
 
             if (flags.baseflow != ZeroBase) {
                 u += Baseflow;
                 u.cmplx(0, 0, 0, 1) -= Complex(ubasefac * flags.Vsuck, 0.);
-                cout << "dPdx(u+U)  == " << getdPdx(u, flags.nu) << endl;
-                cout << "Ubulk(u+U) == " << getUbulk(u) << endl;
+                // cout << "dPdx(u+U)  == " << getdPdx(u, flags.nu) << endl;
+                // cout << "dPdz(u+U)  == " << getdPdz(u, flags.nu) << endl;
+                // cout << "Ubulk(u+U) == " << getUbulk(u) << endl;
+                // cout << "Wbulk(u+U) == " << getWbulk(u) << endl;
+
+                // gokhan: increased precision printing
+                cout << "dPdx(u+U)  == " << fixed << setprecision(numeric_limits<double>::max_digits10) << getdPdx(u, flags.nu) << endl;
+                cout << "dPdz(u+U)  == " << fixed << setprecision(numeric_limits<double>::max_digits10) << getdPdz(u, flags.nu) << endl;
+                cout << "Ubulk(u+U) == " << fixed << setprecision(numeric_limits<double>::max_digits10) << getUbulk(u) << endl;
+                cout << "Wbulk(u+U) == " << fixed << setprecision(numeric_limits<double>::max_digits10) << getWbulk(u) << endl;
+
                 u -= Baseflow;
                 u.cmplx(0, 0, 0, 1) += Complex(ubasefac * flags.Vsuck, 0.);
             }
