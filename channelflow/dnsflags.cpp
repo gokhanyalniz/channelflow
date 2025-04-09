@@ -195,6 +195,8 @@ void DNSFlags::args2BC(ArgList& args) {
     baseflow = s2baseflow(basestr_);
     constraint = s2constraint(meanstr_);
     theta = theta_;
+    Ulowerwall = Ulowerwall_;
+    Uupperwall = Uupperwall_;
     ulowerwall = Ulowerwall_ * cos(theta_);
     uupperwall = Uupperwall_ * cos(theta_);
     wlowerwall = Ulowerwall_ * sin(theta_);
@@ -613,6 +615,8 @@ void DNSFlags::save(const string& outdir) const {
            << setw(REAL_IOWIDTH) << dPdz << "  %dPdz\n"
            << setw(REAL_IOWIDTH) << Ubulk << "  %Ubulk\n"
            << setw(REAL_IOWIDTH) << Wbulk << "  %Wbulk\n"
+           << setw(REAL_IOWIDTH) << Uupperwall << "  %Uupperwall\n"
+           << setw(REAL_IOWIDTH) << Ulowerwall << "  %Ulowerwall\n"
            << setw(REAL_IOWIDTH) << uupperwall << "  %uupperwall\n"
            << setw(REAL_IOWIDTH) << ulowerwall << "  %ulowerwall\n"
            << setw(REAL_IOWIDTH) << wupperwall << "  %wupperwall\n"
@@ -983,7 +987,7 @@ ostream& operator<<(ostream& os, const DNSFlags& flags) {
     os.precision(16);
     os << "nu==" << flags.nu << s << "Vsuck==" << flags.Vsuck << s << "rotation==" << flags.rotation << s
        << "theta==" << flags.theta << s << "dPdx==" << flags.dPdx << s << "dPdz==" << flags.dPdz << s
-       << "Ubulk==" << flags.Ubulk << s << "Wbulk==" << flags.Wbulk << s
+       << "Ubulk==" << flags.Ubulk << s << "Wbulk==" << flags.Wbulk << s << "Uupperwall==" << flags.Uupperwall << s << "Ulowerwall==" << flags.Ulowerwall << s
        << "uupper==" << flags.uupperwall << s << "ulower==" << flags.ulowerwall << s << "wupper==" << flags.wupperwall
        << s << "wlower==" << flags.wlowerwall << s << "t0==" << flags.t0 << s << "dT==" << flags.dT << s
        << "dt==" << flags.dt << s << "variabledt==" << flags.variabledt << s << "dtmin==" << flags.dtmin << s

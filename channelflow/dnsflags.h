@@ -81,8 +81,8 @@ class BodyForce {
 class DNSFlags {
    public:
     //        type name       default
-    DNSFlags(Real nu = 0.0025, Real dPdx = 0.0, Real dPdz = 0.0, Real Ubulk = 0.0, Real Wbulk = 0.0,
-             Real ulowerwall = -1.0, Real uupperwall = 1.0, Real wlowerwall = 0.0, Real wupperwall = 0.0,
+    DNSFlags(Real nu = 0.0025, Real dPdx = 0.0, Real dPdz = 0.0, Real Ubulk = 0.0, Real Wbulk = 0.0, Real Ulowerwall = -1.0, Real Uupperwall = 1.0,
+             Real ulowerwall = 0.0, Real uupperwall = 0.0, Real wlowerwall = 0.0, Real wupperwall = 0.0,
              Real theta = 0.0, Real Vsuck = 0.0, Real rotation = 0.0, Real t0 = 0.0, Real T = 20.0, Real dT = 1.0,
              Real dt = 0.03125, bool variabledt = true, Real dtmin = 0.001, Real dtmax = 0.2, Real CFLmin = 0.4,
              Real CFLmax = 0.6, Real symmetryprojectioninterval = 100.0, BaseFlow baseflow = LaminarBase,
@@ -120,6 +120,8 @@ class DNSFlags {
     Real dPdz;                          // Constraint value for mean flow: pressure gradient in z
     Real Ubulk;                         // Constraint value for mean flow: bulk velocity in x
     Real Wbulk;                         // Constraint value for mean flow: bulk velocity in z
+    Real Ulowerwall;
+    Real Uupperwall;
     Real ulowerwall;                    // lower wall speed along x, e.g. -1 for plane couette
     Real uupperwall;                    // upper wall speed along x, e.g. +1 for plane couette
     Real wlowerwall;                    // lower wall speed along z
