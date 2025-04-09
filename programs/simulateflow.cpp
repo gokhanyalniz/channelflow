@@ -89,8 +89,10 @@ int main(int argc, char* argv[]) {
                 ? true
                 : false;
 
-        cout << "Uwall == " << flags.uupperwall << endl;
-        cout << "Wwall == " << flags.wupperwall << endl;
+        cout << "Uupperwall == " << flags.uupperwall << endl;
+        cout << "Ulowerwall == " << flags.ulowerwall << endl;
+        cout << "Wupperwall == " << flags.wupperwall << endl;
+        cout << "Wlowerwall == " << flags.wlowerwall << endl;
         cout << "dnsflags == " << flags << endl;
         cout << "constructing DNS..." << endl;
         DNS dns({u, q}, flags);
@@ -200,10 +202,8 @@ string printdiagnostics(FlowField& u, const DNS& dns, Real t, const TimeStep& dt
         U.makeSpectral();
         U += Re(u.profile(0, 0, 0));
         Real Ucenter = U.eval(0.5 * (u.a() + u.b()));
-        Real Uwall = pythag(0.5 * (U.eval_b() - U.eval_a()), 0.5 * (W.eval_b() - W.eval_a()));
         Real Umean = U.mean();
         sout << "        1/nu == " << 1 / nu << endl;
-        sout << "  Uwall h/nu == " << Uwall * h / nu << endl;
         sout << "  Ubulk h/nu == " << dns.Ubulk() * h / nu << endl;
         sout << "  Umean h/nu == " << Umean << " * " << h << " / " << nu << endl;
         sout << "  Umean h/nu == " << Umean * h / nu << endl;

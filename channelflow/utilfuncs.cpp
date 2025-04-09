@@ -837,8 +837,10 @@ DNSFlags setBaseFlowFlags(ArgList& args, string& Uname, string& Wname) {
     const Real dPds_ =
         args.getreal("-dPds", "--dPds", 0.0, "magnitude of imposed pressure gradient along streamwise s");
     const Real Ubulk_ = args.getreal("-Ubulk", "--Ubulk", 0.0, "magnitude of imposed bulk velocity");
-    const Real Uwall_ =
-        args.getreal("-Uwall", "--Uwall", 1.0, "magnitude of imposed wall velocity, +/-Uwall at y = +/-h");
+    const Real Uupperwall_ =
+        args.getreal("-Uupperwall", "--Uupperwall", 1.0, "magnitude of imposed wall velocity, Uupperwall at y = h");
+    const Real Ulowerwall_ =
+        args.getreal("-Ulowerwall", "--Ulowerwall", -1.0, "magnitude of imposed wall velocity, Ulowerwall at y = -h");
     const Real theta_ = args.getreal("-theta", "--theta", 0.0, "angle of base flow relative to x-axis");
     const Real Vsuck_ = args.getreal("-Vs", "--Vsuck", 0.0, "wall-normal suction velocity");
 
@@ -847,11 +849,10 @@ DNSFlags setBaseFlowFlags(ArgList& args, string& Uname, string& Wname) {
     flags.nu = (nuarg != 0) ? nuarg : 1.0 / Reynolds;
     flags.constraint = s2constraint(meanstr_);
     flags.theta = theta_;
-    flags.Uwall = Uwall_;
-    flags.ulowerwall = -Uwall_ * cos(theta_);
-    flags.uupperwall = Uwall_ * cos(theta_);
-    flags.wlowerwall = -Uwall_ * sin(theta_);
-    flags.wupperwall = Uwall_ * sin(theta_);
+    flags.ulowerwall = Ulowerwall * cos(theta_);
+    flags.uupperwall = Uupperwall_ * cos(theta_);
+    flags.wlowerwall = Ulowerwall * sin(theta_);
+    flags.wupperwall = Uupperwall_ * sin(theta_);
     flags.Vsuck = Vsuck_;
     flags.dPdx = dPds_ * cos(theta_);
     flags.dPdz = dPds_ * sin(theta_);

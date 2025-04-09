@@ -771,39 +771,30 @@ bool NSE::isAliasedMode(int kx, int kz) const { return (abs(kx) > kxd_max_ || (a
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-Real viscosity(Real Reynolds, VelocityScale vscale, MeanConstraint constraint, Real dPdx, Real Ubulk, Real Uwall,
+Real viscosity(Real Reynolds, MeanConstraint constraint, Real dPdx, Real Ubulk,
                Real h) {
     Real nu = 0.0;
     /*****************************************************
-    cout << "viscosity(Reynolds, vscale, contraint, dPdx, Ubulk, Uwall, h) : " << endl;
+    cout << "viscosity(Reynolds, contraint, dPdx, Ubulk, h) : " << endl;
     cout << "  Reynolds == " << Reynolds << endl;
-    cout << "    vscale == " << vscale << endl;
     cout << "constraint == " << constraint << endl;
     cout << "      dPdx == " << dPdx << endl;
     cout << "     Ubulk == " << Ubulk<< endl;
-    cout << "     Uwall == " << Uwall << endl;
     cout << "         h == " << h << endl;
     *****************************************************/
-    if (vscale == WallScale) {
-        // cout << "Computing WallScale Reynolds" << endl;
-        Real U = fabs(Uwall);
-        nu = U * h / Reynolds;
-    } else {  // vscale == ParabolicScale
-        // cout << "Computing Parabolic Reynolds" << endl;
-        if (constraint == PressureGradient) {
-            // cout << "...from pressure gradient" << endl;
-            // Pressure gradient determines Ubulk, so determine Ucenter and nu as follows
-            // U(y) == Ucenter (1-(y/h)^2), so 0 == -dPdx + nu U'' gives
-            // Ucenter == -h^2/(2nu) dP/dx and Reynolds == Ucenter h/nu then gives
-            // nu == sqrt(h^3 |dPdx|/(2 Reynolds))
-            nu = sqrt(pow(h, 3) * fabs(dPdx) / (2 * Reynolds));
-        }
+    if (constraint == PressureGradient) {
+        // cout << "...from pressure gradient" << endl;
+        // Pressure gradient determines Ubulk, so determine Ucenter and nu as follows
+        // U(y) == Ucenter (1-(y/h)^2), so 0 == -dPdx + nu U'' gives
+        // Ucenter == -h^2/(2nu) dP/dx and Reynolds == Ucenter h/nu then gives
+        // nu == sqrt(h^3 |dPdx|/(2 Reynolds))
+        nu = sqrt(pow(h, 3) * fabs(dPdx) / (2 * Reynolds));
+    }
 
-        else {  // constraint == BulkVelocity
-            // cout << "...from bulk velocity" << endl;
-            // Ucenter == 3/2 Ubulk, so Reynolds == Ucenter h/nu gives nu == 3/2 Ubulk h/Reynolds
-            nu = 1.5 * Ubulk * h / Reynolds;
-        }
+    else {  // constraint == BulkVelocity
+        // cout << "...from bulk velocity" << endl;
+        // Ucenter == 3/2 Ubulk, so Reynolds == Ucenter h/nu gives nu == 3/2 Ubulk h/Reynolds
+        nu = 1.5 * Ubulk * h / Reynolds;
     }
     // cout << "returning nu == " << nu << endl;
     return nu;

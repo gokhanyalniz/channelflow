@@ -48,14 +48,12 @@ int main(int argc, char* argv[]) {
         // const int  minscale = -8;  // scale dPdx, Ubulk, Vsuck, randomly bewteen 10^minscale and 10^maxscale
         // const int  maxscale = 2;
 
-        // const Real Uwallmax = 10.0;   // maximum wall separation
 
         // Options
         // bulk velocty or pressure constraint (coin flip)
         //   Ubulk zero or nonzero  O(1)
         //   dPdx  zero or nonzero -O(nu)
         // Vsuck   zero or nonzero  O(nu)
-        // Uwall   zero or nonzero  O(1)
         // theta   zero or nonzero  O(1)
 
         // random nonzero H         O(1) => a,b

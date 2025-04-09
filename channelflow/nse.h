@@ -165,7 +165,7 @@ ChebyCoeff laminarProfile(const DNSFlags& flags, Real a, Real b, int Ny);
 // Return viscosity nu == Uh/Reynolds, where U is determined by VelocityScale.
 // For BulkScale or ParabolicScale, U is determined from either dPdx or Ubulk,
 // depending on whether MeanConstraint is PressureGradient or BulkVelocity
-Real viscosity(Real Reynolds, VelocityScale vscale, MeanConstraint constraint, Real dPdx, Real Ubulk, Real Uwall,
+Real viscosity(Real Reynolds, MeanConstraint constraint, Real dPdx, Real Ubulk,
                Real h);
 
 }  // namespace chflow

@@ -210,36 +210,36 @@ void cfDSI::updateMu(Real mu) {
         dnsflags_.dPdx *= ratio;
     } else if (cPar_ == continuationParameter::Theta) {
         dnsflags_.theta = mu;
-        dnsflags_.ulowerwall = -dnsflags_.Uwall * cos(mu);
-        dnsflags_.uupperwall = dnsflags_.Uwall * cos(mu);
-        dnsflags_.wlowerwall = -dnsflags_.Uwall * sin(mu);
-        dnsflags_.wupperwall = dnsflags_.Uwall * sin(mu);
+        dnsflags_.ulowerwall = dnsflags_.Ulowerwall * cos(mu);
+        dnsflags_.uupperwall = dnsflags_.Uupperwall * cos(mu);
+        dnsflags_.wlowerwall = dnsflags_.Ulowerwall * sin(mu);
+        dnsflags_.wupperwall = dnsflags_.Uupperwall * sin(mu);
         ;
     } else if (cPar_ == continuationParameter::ThArc) {
         Real xleg = Lz_ / tan(dnsflags_.theta);  // hypothetical Lx
         Lz_ *= sin(mu) / sin(dnsflags_.theta);   // rescale Lz for new angle at const diagonal (of xleg x Lz_)
         Lx_ *= Lz_ / tan(mu) / xleg;
         dnsflags_.theta = mu;
-        dnsflags_.ulowerwall = -dnsflags_.Uwall * cos(mu);
-        dnsflags_.uupperwall = dnsflags_.Uwall * cos(mu);
-        dnsflags_.wlowerwall = -dnsflags_.Uwall * sin(mu);
-        dnsflags_.wupperwall = dnsflags_.Uwall * sin(mu);
+        dnsflags_.ulowerwall = dnsflags_.Ulowerwall * cos(mu);
+        dnsflags_.uupperwall = dnsflags_.Uupperwall * cos(mu);
+        dnsflags_.wlowerwall = dnsflags_.Ulowerwall * sin(mu);
+        dnsflags_.wupperwall = dnsflags_.Uupperwall * sin(mu);
         ;
     } else if (cPar_ == continuationParameter::ThLx) {
         Lx_ *= tan(dnsflags_.theta) / tan(mu);
         dnsflags_.theta = mu;
-        dnsflags_.ulowerwall = -dnsflags_.Uwall * cos(mu);
-        dnsflags_.uupperwall = dnsflags_.Uwall * cos(mu);
-        dnsflags_.wlowerwall = -dnsflags_.Uwall * sin(mu);
-        dnsflags_.wupperwall = dnsflags_.Uwall * sin(mu);
+        dnsflags_.ulowerwall = dnsflags_.Ulowerwall * cos(mu);
+        dnsflags_.uupperwall = dnsflags_.Uupperwall * cos(mu);
+        dnsflags_.wlowerwall = dnsflags_.Ulowerwall * sin(mu);
+        dnsflags_.wupperwall = dnsflags_.Uupperwall * sin(mu);
         ;
     } else if (cPar_ == continuationParameter::ThLz) {
         Lz_ *= tan(mu) / tan(dnsflags_.theta);
         dnsflags_.theta = mu;
-        dnsflags_.ulowerwall = -dnsflags_.Uwall * cos(mu);
-        dnsflags_.uupperwall = dnsflags_.Uwall * cos(mu);
-        dnsflags_.wlowerwall = -dnsflags_.Uwall * sin(mu);
-        dnsflags_.wupperwall = dnsflags_.Uwall * sin(mu);
+        dnsflags_.ulowerwall = dnsflags_.Ulowerwall * cos(mu);
+        dnsflags_.uupperwall = dnsflags_.Uupperwall * cos(mu);
+        dnsflags_.wlowerwall = dnsflags_.Ulowerwall * sin(mu);
+        dnsflags_.wupperwall = dnsflags_.Uupperwall * sin(mu);
         ;
     } else if (cPar_ == continuationParameter::Lx) {
         Lx_ = mu;
