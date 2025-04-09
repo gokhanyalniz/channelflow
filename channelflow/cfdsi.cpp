@@ -198,12 +198,12 @@ void cfDSI::updateMu(Real mu) {
         dnsflags_.dPdx = mu;
     } else if (cPar_ == continuationParameter::Ub) {
         dnsflags_.Ubulk = mu;
-    } else if (cPar_ == continuationParameter::Uw) {
-        dnsflags_.ulowerwall = -mu * cos(dnsflags_.theta);
-        dnsflags_.uupperwall = mu * cos(dnsflags_.theta);
-        dnsflags_.wlowerwall = -mu * sin(dnsflags_.theta);
-        dnsflags_.wupperwall = mu * sin(dnsflags_.theta);
-        ;
+    // } else if (cPar_ == continuationParameter::Uw) { // gokhan: need to reimplement this
+    //     dnsflags_.ulowerwall = -mu * cos(dnsflags_.theta);
+    //     dnsflags_.uupperwall = mu * cos(dnsflags_.theta);
+    //     dnsflags_.wlowerwall = -mu * sin(dnsflags_.theta);
+    //     dnsflags_.wupperwall = mu * sin(dnsflags_.theta);
+    //     ;
     } else if (cPar_ == continuationParameter::ReP) {
         Real ratio = 1 / (mu * dnsflags_.nu);  // (Re_old/Re_new), Re_new = mu
         dnsflags_.nu = 1. / mu;
@@ -305,9 +305,9 @@ void cfDSI::chooseMu(continuationParameter mu) {
         case continuationParameter::Ub:
             updateMu(dnsflags_.Ubulk);
             break;
-        case continuationParameter::Uw:
-            updateMu(dnsflags_.uupperwall / cos(dnsflags_.theta));
-            break;
+        // case continuationParameter::Uw: // gokhan: need to reimplement this
+        //     updateMu(dnsflags_.uupperwall / cos(dnsflags_.theta));
+        //     break;
         case continuationParameter::ReP:
             updateMu(1. / dnsflags_.nu);
             break;

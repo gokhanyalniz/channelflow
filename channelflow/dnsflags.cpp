@@ -107,7 +107,7 @@ void BodyForce::eval(Real t, FlowField& f) {
 // virtual
 bool BodyForce::isOn(Real t) { return true; }
 
-DNSFlags::DNSFlags(Real nu_, Real dPdx_, Real dPdz_, Real Ubulk_, Real Wbulk_, Real ulowerwall_,
+DNSFlags::DNSFlags(Real nu_, Real dPdx_, Real dPdz_, Real Ubulk_, Real Wbulk_, Real Ulowerwall_, Real Uupperwall_, Real ulowerwall_,
                    Real uupperwall_, Real wlowerwall_, Real wupperwall_, Real theta_, Real Vsuck_, Real rotation_,
                    Real t0_, Real T_, Real dT_, Real dt_, bool variabledt_, Real dtmin_, Real dtmax_, Real CFLmin_,
                    Real CFLmax_, Real symmetryprojectioninterval_, BaseFlow baseflow_, MeanConstraint constraint_,
@@ -130,6 +130,8 @@ DNSFlags::DNSFlags(Real nu_, Real dPdx_, Real dPdz_, Real Ubulk_, Real Wbulk_, R
       dPdz(dPdz_),
       Ubulk(Ubulk_),
       Wbulk(Wbulk_),
+      Ulowerwall(Ulowerwall_),
+      Uupperwall(Uupperwall_),
       ulowerwall(ulowerwall_),
       uupperwall(uupperwall_),
       wlowerwall(wlowerwall_),
@@ -182,10 +184,10 @@ void DNSFlags::args2BC(ArgList& args) {
     const Real dPds_ =
         args.getreal("-dPds", "--dPds", 0.0, "magnitude of imposed pressure gradient along streamwise s");
     const Real Ubulk_ = args.getreal("-Ubulk", "--Ubulk", 0.0, "magnitude of imposed bulk velocity");
-    const Real Uupperwall_ =
-        args.getreal("-Uupperwall", "--Uupperwall", 1.0, "magnitude of imposed wall velocity, Uupperwall at y = h");
     const Real Ulowerwall_ =
         args.getreal("-Ulowerwall", "--Ulowerwall", -1.0, "magnitude of imposed wall velocity, Ulowerwall at y = -h");
+    const Real Uupperwall_ =
+        args.getreal("-Uupperwall", "--Uupperwall", 1.0, "magnitude of imposed wall velocity, Uupperwall at y = h");
     const Real theta_ = args.getreal("-theta", "--theta", 0.0, "angle of base flow relative to x-axis");
     const Real Vsuck_ = args.getreal("-Vs", "--Vsuck", 0.0, "wall-normal suction velocity");
     const Real rotation_ = args.getreal("-rot", "--rotation", 0.0, "rotation around the z-axis");
@@ -193,9 +195,9 @@ void DNSFlags::args2BC(ArgList& args) {
     baseflow = s2baseflow(basestr_);
     constraint = s2constraint(meanstr_);
     theta = theta_;
-    ulowerwall = Ulowerwall * cos(theta_);
+    ulowerwall = Ulowerwall_ * cos(theta_);
     uupperwall = Uupperwall_ * cos(theta_);
-    wlowerwall = Ulowerwall * sin(theta_);
+    wlowerwall = Ulowerwall_ * sin(theta_);
     wupperwall = Uupperwall_ * sin(theta_);
     Vsuck = Vsuck_;
     rotation = rotation_;
@@ -660,6 +662,8 @@ void DNSFlags::load(int taskid, const string indir) {
     dPdz = getRealfromLine(taskid, is);
     Ubulk = getRealfromLine(taskid, is);
     Wbulk = getRealfromLine(taskid, is);
+    Uupperwall = getRealfromLine(taskid, is);
+    Ulowerwall = getRealfromLine(taskid, is);
     uupperwall = getRealfromLine(taskid, is);
     ulowerwall = getRealfromLine(taskid, is);
     wupperwall = getRealfromLine(taskid, is);
@@ -695,6 +699,8 @@ const vector<string> DNSFlags::getFlagList() {
                                      "%dPdz",
                                      "%Ubulk",
                                      "%Wbulk",
+                                     "%Uupperwall",
+                                     "%Ulowerwall",
                                      "%uupperwall",
                                      "%ulowerwall",
                                      "%wupperwall",
