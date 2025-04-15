@@ -51,6 +51,8 @@ int main(int argc, char* argv[]) {
         flags.dealiasing = DealiasXZ;
         // flags.nonlinearity = SkewSymmetric;
         // flags.dealiasing   = NoDealiasing;
+        flags.Uupperwall = 1.0;
+        flags.Ulowerwall = -1.0;
         flags.ulowerwall = -1.0;
         flags.uupperwall = 1.0;
         flags.taucorrection = true;

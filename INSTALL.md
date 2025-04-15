@@ -103,7 +103,7 @@ The following example integrates for 200 advective time units a simple plane Cou
 
 `simulateflow -T 200 newfield.nc`
 
-The following example simulates a pressure driven (-dPds) Poiseuille flow (-Uupperwall 0 -Ulowerwall 0) at the Reynolds number 1000 using
+The following example simulates a pressure driven (-dPds) Poiseuille flow (-Ulowerwall 0 -Uupperwall 0) at the Reynolds number 1000 using
 a 1st order forward-backward euler scheme as initial time stepping algorithm (-is).
 
-`simulateflow -R 1000 -Uupperwall 0 -Ulowerwall 0 -dPds -0.002 -is SBDF1 newfield.nc`
+`simulateflow -R 1000 -Ulowerwall 0 -Uupperwall 0 -dPds -0.002 -is SBDF1 newfield.nc`

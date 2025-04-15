@@ -849,9 +849,11 @@ DNSFlags setBaseFlowFlags(ArgList& args, string& Uname, string& Wname) {
     flags.nu = (nuarg != 0) ? nuarg : 1.0 / Reynolds;
     flags.constraint = s2constraint(meanstr_);
     flags.theta = theta_;
-    flags.ulowerwall = Ulowerwall * cos(theta_);
+    flags.Uupperwall = Uupperwall_;
+    flags.Ulowerwall = Ulowerwall_;
+    flags.ulowerwall = Ulowerwall_ * cos(theta_);
     flags.uupperwall = Uupperwall_ * cos(theta_);
-    flags.wlowerwall = Ulowerwall * sin(theta_);
+    flags.wlowerwall = Ulowerwall_ * sin(theta_);
     flags.wupperwall = Uupperwall_ * sin(theta_);
     flags.Vsuck = Vsuck_;
     flags.dPdx = dPds_ * cos(theta_);
