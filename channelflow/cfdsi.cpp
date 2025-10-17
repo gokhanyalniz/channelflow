@@ -208,6 +208,7 @@ void cfDSI::updateMu(Real mu) {
         Real ratio = 1 / (mu * dnsflags_.nu);  // (Re_old/Re_new), Re_new = mu
         dnsflags_.nu = 1. / mu;
         dnsflags_.dPdx *= ratio;
+        dnsflags_.dPdz *= ratio;
     } else if (cPar_ == continuationParameter::Theta) {
         dnsflags_.theta = mu;
         dnsflags_.ulowerwall = -dnsflags_.Uwall * cos(mu);
